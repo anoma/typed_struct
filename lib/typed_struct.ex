@@ -96,6 +96,12 @@ defmodule TypedStruct do
 
   @doc false
   def __typedstruct__(block, opts) do
+    bad_opt_keys = opts
+                   |> Enum.map(fn {k, _v} -> k end)
+                   |> Enum.filter(fn k -> k not in [:enforce, :opaque, :module] end)
+    if bad_opt_keys != [] do
+      raise ArgumentError, "bad options #{inspect(bad_opt_keys)}"
+    end
     quote do
       Enum.each(unquote(@accumulating_attrs), fn attr ->
         Module.register_attribute(__MODULE__, attr, accumulate: true)
@@ -170,6 +176,12 @@ defmodule TypedStruct do
       non-nullable
   """
   defmacro field(name, type, opts \\ []) do
+    bad_opt_keys = opts
+                   |> Enum.map(fn {k, _v} -> k end)
+                   |> Enum.filter(fn k -> k not in [:default, :enforce] end)
+    if bad_opt_keys != [] do
+      raise ArgumentError, "bad options #{inspect(bad_opt_keys)}"
+    end
     quote bind_quoted: [name: name, type: Macro.escape(type), opts: opts] do
       TypedStruct.__field__(name, type, opts, __ENV__)
     end
