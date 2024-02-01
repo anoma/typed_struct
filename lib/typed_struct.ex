@@ -107,7 +107,7 @@ defmodule TypedStruct do
         Module.register_attribute(__MODULE__, attr, accumulate: true)
       end)
 
-      Module.put_attribute(__MODULE__, :ts_enforce?, unquote(!!opts[:enforce]))
+      Module.put_attribute(__MODULE__, :ts_enforce?, unquote(if opts[:enforce] == nil do true else opts[:enforce] end))
       @before_compile {unquote(__MODULE__), :__plugin_callbacks__}
 
       import TypedStruct
